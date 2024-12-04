@@ -14,13 +14,8 @@ passport.use(
       try {
         const user = await prisma.usuario.findUnique({ where: { email } });
 
-        if (!user) {
-          return done(null, false, { message: "Usuario no encontrado" });
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-          return done(null, false, { message: "Contraseña incorrecta" });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+          return done(null, false, { message: "Credenciales incorrectas" });
         }
 
         const userWithoutPassword = {
