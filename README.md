@@ -60,14 +60,8 @@ Este proyecto es una API RESTful para administrar una lista de tareas asociadas 
     ```
 
 ### **Tareas**
-Para todos estos endpoint se requiere tomar el token generado en `/auth/login` y colocarlo en `Authorization` como un `Bearer Token`
+Para todos estos endpoint se requiere tomar el token generado en `/auth/login` y colocarlo en la columna de `Authorization` si se usa postman y en `Auth Type` colocarlo como un `Bearer Token`
 - **GET** `/tasks`: Obtiene todas las tareas del usuario autenticado.
-  - **Headers:**
-    ```json
-    {
-      "Authorization": "Bearer JWT_TOKEN"
-    }
-    ```
 
 - **POST** `/tasks`: Crea una nueva tarea.
   - **Body:**

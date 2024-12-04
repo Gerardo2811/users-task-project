@@ -14,22 +14,27 @@ export class TasksController {
       const limit = Number(req.query.limit) || 10;
 
       if (page < 1 || limit < 1) {
-        res
-          .status(400)
-          .json({
-            error: "Los valores de 'page' y 'limit' deben ser mayores a 0",
-          });
+        res.status(400).json({
+          error: "Los valores de 'page' y 'limit' deben ser mayores a 0",
+        });
         return;
       }
 
       const paginatedTasks = await this.tasksService.getAllTasks(page, limit);
+
+      if (paginatedTasks.tasks.length === 0) {
+        res.status(404).json({
+          message: "No hay tareas disponibles.",
+          data: paginatedTasks,
+        });
+        return;
+      }
 
       res.status(200).json({
         message: "Tareas obtenidas correctamente",
         data: paginatedTasks,
       });
     } catch (error: any) {
-      console.error("Error al obtener tareas:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   }
@@ -60,24 +65,23 @@ export class TasksController {
   async createTask(req: Request, res: Response): Promise<void> {
     try {
       const { title, description, userId, state } = req.body;
-  
+
       if (!title || !description || !userId) {
-        res
-          .status(400)
-          .json({
-            error: "Todos los campos obligatorios deben ser proporcionados",
-          });
-        return;
-      }
-  
-      const validStates = ["pendiente", "en_progreso", "completada"];
-      if (state && !validStates.includes(state)) {
         res.status(400).json({
-          error: "El estado proporcionado no es válido. Debe ser 'pendiente', 'en_progreso' o 'completada'.",
+          error: "Todos los campos obligatorios deben ser proporcionados",
         });
         return;
       }
-  
+
+      const validStates = ["pendiente", "en_progreso", "completada"];
+      if (state && !validStates.includes(state)) {
+        res.status(400).json({
+          error:
+            "El estado proporcionado no es válido. Debe ser 'pendiente', 'en_progreso' o 'completada'.",
+        });
+        return;
+      }
+
       const task = await this.tasksService.createTask(
         title,
         description,
@@ -89,12 +93,10 @@ export class TasksController {
       if (error.message.includes("No se encontró el usuario")) {
         res.status(404).json({ error: error.message });
       } else {
-        console.error("Error al crear la tarea:", error);
         res.status(500).json({ error: "Error interno del servidor" });
       }
     }
   }
-  
 
   async updateTask(req: Request, res: Response): Promise<void> {
     try {
@@ -105,7 +107,7 @@ export class TasksController {
         res.status(400).json({ error: "El ID proporcionado no es válido" });
         return;
       }
-  
+
       const validStates = ["pendiente", "en_progreso", "completada"];
       if (state && !validStates.includes(state)) {
         res.status(400).json({
@@ -114,14 +116,14 @@ export class TasksController {
         });
         return;
       }
-  
+
       const updatedTask = await this.tasksService.updateTask(
         Number(id),
         title,
         description,
-        state as "pendiente" | "en_progreso" | "completada" 
+        state as "pendiente" | "en_progreso" | "completada"
       );
-  
+
       res
         .status(200)
         .json({ message: "Tarea actualizada con éxito", task: updatedTask });
@@ -129,12 +131,10 @@ export class TasksController {
       if (error.message.includes("No se encontró la tarea")) {
         res.status(404).json({ error: error.message });
       } else {
-        console.error("Error al actualizar la tarea:", error);
         res.status(500).json({ error: "Error interno del servidor" });
       }
     }
   }
-  
 
   async deleteTask(req: Request, res: Response): Promise<void> {
     try {
@@ -153,7 +153,6 @@ export class TasksController {
       if (error.message.includes("No se encontró la tarea")) {
         res.status(404).json({ error: error.message });
       } else {
-        console.error("Error al eliminar la tarea:", error);
         res.status(500).json({ error: "Error interno del servidor" });
       }
     }
