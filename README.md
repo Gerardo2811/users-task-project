@@ -79,13 +79,13 @@ Para todos estos endpoint se requiere tomar el token generado en `/auth/login` y
     }
     ```
 
-- **PUT** `/tasks/:id`: Actualiza una tarea específica.
+- **PUT** `/tasks/:id`: Actualiza una tarea específica. para `state` usar los valores permitidos: `pendiente, en_progreso, completada`
   - **Body:**
     ```json
     {
       "title": "Nuevo título",
       "description": "Nueva descripción",
-      "status": "completed"
+      "status": "en_progreso"
     }
     ```
 
